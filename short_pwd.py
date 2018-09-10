@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
 import os
-import sys
 from socket import gethostname
 from subprocess import run, PIPE
 import re
 
 def escaper(b, e, content):
     return '\\[\x1b[{}m\\]{}\\[\x1b[{}m\\]'.format(b, content, e)
+def int_or_none(s):
+    try: return int(s) 
+    except: return None
+
+trunc_len = int_or_none(os.environ.get('PROMPT_TRUNCATE_LENGTH')) or 20
+path_len = int_or_none(os.environ.get('PROMPT_PATH_LENGTH')) or 5
 
 hostname = gethostname()
 username = os.environ['USER']
 pwd = os.getcwd()
 homedir = os.path.expanduser('~')
 pwd = pwd.replace(homedir, '~', 1)
-if len(pwd) > int(sys.argv[1]):
+if len(pwd) > trunc_len:
     # pwd = '\[\x1b[31m/\x1b[0m\]'.join(list(map(lambda x: x[0:4] if len(x) > 0 else '', pwd.split('/'))))
     pwd = escaper(
-        31, 0, '/').join(list(map(lambda x: x[0:4] if len(x) > 0 else '', pwd.split('/'))))
+        31, 0, '/').join(list(map(lambda x: x[0:path_len] if len(x) > path_len else x, pwd.split('/'))))
     pwd += escaper(31, 0, '/')
     # pwd = pwd[:10]+'...'+pwd[-20:] # first 10 chars+last 20 chars
 

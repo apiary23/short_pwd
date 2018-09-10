@@ -1,6 +1,8 @@
 # short_pwd.py
----
+
 Shell prompt shortener & colorizer.
+
+![Preview](https://raw.githubusercontent.com/apiary23/short_pwd/master/prev.png "Tricked-out Prompt")
 
 Usage:
 
