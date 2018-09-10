@@ -5,7 +5,12 @@ from subprocess import run, PIPE
 import re
 
 def escaper(b, e, content):
-    return '\\[\x1b[{}m\\]{}\\[\x1b[{}m\\]'.format(b, content, e)
+    'Surround `content` with Bash color escapes of numbers `b` and `e`'
+    if type(b) is list:
+        b = '\x1b[' + ';'.join(list(map(lambda x: str(x), b))) + 'm'
+        return '\\[{}\\]{}\\[\x1b[{}m\\]'.format(b, content, e)
+    else:
+        return '\\[\x1b[{}m\\]{}\\[\x1b[{}m\\]'.format(b, content, e)
 def int_or_none(s):
     try: return int(s) 
     except: return None
@@ -19,11 +24,9 @@ pwd = os.getcwd()
 homedir = os.path.expanduser('~')
 pwd = pwd.replace(homedir, '~', 1)
 if len(pwd) > trunc_len:
-    # pwd = '\[\x1b[31m/\x1b[0m\]'.join(list(map(lambda x: x[0:4] if len(x) > 0 else '', pwd.split('/'))))
     pwd = escaper(
-        31, 0, '/').join(list(map(lambda x: x[0:path_len] if len(x) > path_len else x, pwd.split('/'))))
-    pwd += escaper(31, 0, '/')
-    # pwd = pwd[:10]+'...'+pwd[-20:] # first 10 chars+last 20 chars
+        [1, 91], 0, '/').join(list(map(lambda x: x[0:path_len] if len(x) > path_len else x, pwd.split('/'))))
+    pwd += escaper(91, 0, '/')
 
 branch = ''
 if run(['which', 'git'], stderr=PIPE, stdout=PIPE).returncode is 0:
